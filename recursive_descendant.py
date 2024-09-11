@@ -11,7 +11,7 @@ def print_grammar(G: Grammar) -> None:
 
 def create_example_grammar() -> Grammar:
     G = Grammar()
-    G.add_nonterminal('S')
+    G.add_nonterminal('S') 
     G.add_nonterminal('stmt')
     G.add_nonterminal('stmts')
     G.add_nonterminal('type')
@@ -19,11 +19,10 @@ def create_example_grammar() -> Grammar:
     G.add_nonterminal('decl')
     G.add_nonterminal('decls')
     G.add_nonterminal('assignment')
-    # G.add_nonterminal('assign')
+    G.add_nonterminal('assign')
     G.add_nonterminal('attr')
     G.add_nonterminal('conditional')   
     G.add_nonterminal('loop')
-    # G.add_nonterminal('cond')
     G.add_nonterminal('endcond')
     G.add_nonterminal('arithexp')
     G.add_nonterminal('binarymp')
@@ -39,9 +38,8 @@ def create_example_grammar() -> Grammar:
     G.add_nonterminal('factor')
     G.add_nonterminal('cmpexp')
     G.add_nonterminal('cmp')
-    G.add_nonterminal('term')
-    
-    
+    G.add_nonterminal('term') #28
+      
     G.add_terminal('$')
     G.add_terminal('id')
     G.add_terminal('const')
@@ -78,16 +76,14 @@ def create_example_grammar() -> Grammar:
     G.add_terminal(')')
     G.add_terminal('->')
 
-
-    G.add_production('S', ['begin', 'main', 'decls', 'stmts', 'end']) #62
-    G.add_production('S', ['$'])  # id: 63
-    G.add_production('decls', ['decl', 'decls'])  # id: 64
-    G.add_production('decls', [])  # id: 65
+    G.add_production('S', ['begin', 'main', 'decls', 'stmts', 'end']) #63
+    G.add_production('S', ['$'])  # id: 64
+    G.add_production('decls', ['decl', 'decls'])  # id: 65
+    G.add_production('decls', [])  # id: 66
     G.add_production('decl', ['type', 'id'])  # id: 66
     G.add_production('stmts', ['stmt', 'stmts'])  # id: 67
     G.add_production('stmts', [])  # id: 68
     G.add_production('stmt', ['print', 'value'])  # id: 69
-    #G.add_production('stmt', ['decl'])  # id: 70
     G.add_production('stmt', ['assignment'])  # id: 71
     G.add_production('stmt', ['conditional'])  # id: 72
     G.add_production('stmt', ['loop'])  # id: 73
@@ -113,7 +109,6 @@ def create_example_grammar() -> Grammar:
     G.add_production('orexp', ['andexp', '<or>'])  # id: 92
     G.add_production('andexp', ['factor', '<and>'])  # id: 93
     G.add_production('factor', ['not', 'factor'])  # id: 94
-    G.add_production('factor', ['value'])  # id: 95
     G.add_production('factor', ['(', 'orexp', ')'])  # id: 96
     G.add_production('factor', ['cmpexp'])  # id: 97
     G.add_production('assign', ['+'])  # id: 98
@@ -133,55 +128,53 @@ def create_example_grammar() -> Grammar:
     G.add_production('cmp', ['greater-equal'])  # id: 112
     G.add_production('cmp', ['less'])  # id: 113
     G.add_production('cmp', ['less-equal'])  # id: 114    
-    G.add_production('term', ['value'])  # id: 115
-    #G.add_production('cmpexp', ['term', 'cmp', 'term'])  # id: 100
+    G.add_production('term', ['cmp','value'])  # id: 115
+    G.add_production('term', [])  # id: 115
+    G.add_production('cmpexp', ['value', 'term'])  # id: 100
     
     return G
 
 def S(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(62):
+    if ts.peek() in p.predict(63):
         print("Parsing S -> begin main decls stmts end")
         ts.match('begin')
         ts.match('main')
         decls(ts, p)
         stmts(ts, p)
         ts.match('end')
-    elif ts.peek() in p.predict(63):
+    elif ts.peek() in p.predict(64):
         print("Parsing S -> $")
         ts.match('$')
 
 def decls(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(73):
+    if ts.peek() in p.predict(65):
         print("Parsing decls -> decl decls")
         decl(ts, p)
         decls(ts, p)
-    elif ts.peek() in p.predict(74):
+    elif ts.peek() in p.predict(66):
         print("Parsing decls -> ε")
         return
 
 def decl(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(66):
+    if ts.peek() in p.predict(67):
         print("Parsing decl -> type id")
         type(ts, p)
         ts.match('id')   
 
 def stmts(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(67):
+    if ts.peek() in p.predict(68):
         print("Parsing stmts -> stmt stmts")
         stmt(ts, p)
         stmts(ts, p)
-    elif ts.peek() in p.predict(68):
+    elif ts.peek() in p.predict(69):
         print("Parsing stmts -> ε")
         return
 
 def stmt(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(69):
+    if ts.peek() in p.predict(70):
         print("Parsing stmt -> print value")
         ts.match('print')
         value(ts, p)
-    elif ts.peek() in p.predict(70):
-        print("Parsing stmt -> decl")
-        decl(ts, p)
     elif ts.peek() in p.predict(71):
         print("Parsing stmt -> assignment")
         assignment(ts, p)
@@ -193,14 +186,14 @@ def stmt(ts: token_sequence, p: predict_algorithm) -> None:
         loop(ts, p)
 
 def assignment(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(73):
+    if ts.peek() in p.predict(74):
         print("Parsing assignment -> id assign arithexp")
         ts.match('id')
         assign(ts, p)
         arithexp(ts, p)   
 
 def conditional(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(74):
+    if ts.peek() in p.predict(75):
         print("Parsing conditional -> if logicexp stmts endcond")
         ts.match('if')
         logicexp(ts, p)
@@ -208,17 +201,17 @@ def conditional(ts: token_sequence, p: predict_algorithm) -> None:
         endcond(ts, p)
 
 def endcond(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(74):
+    if ts.peek() in p.predict(76):
         print("Parsing endcond -> end-if")
         ts.match('end-if')
-    elif ts.peek() in p.predict(75):
+    elif ts.peek() in p.predict(77):
         print("Parsing endcond -> else stmts end-if")
         ts.match('else')
         stmts(ts, p)
         ts.match('end-if')
 
 def loop(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(77):
+    if ts.peek() in p.predict(78):
         print("Parsing loop -> while logicexp stmts end-while")
         ts.match('while')
         logicexp(ts, p)
@@ -226,85 +219,85 @@ def loop(ts: token_sequence, p: predict_algorithm) -> None:
         ts.match('end-while')
 
 def value(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(78):
+    if ts.peek() in p.predict(79):
         print("Parsing value -> id")
         ts.match('id')
-    elif ts.peek() in p.predict(79):
+    elif ts.peek() in p.predict(80):
         print("Parsing value -> const")
         ts.match('const')
 
 def arithexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(80):
+    if ts.peek() in p.predict(81):
         print("Parsing arithexp -> binarymp")
         binarymp(ts, p)   
 
 def binarymp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(81):
+    if ts.peek() in p.predict(82):
         print("Parsing binarymp -> binarytd mpexp")
         binarytd(ts, p)
         mpexp(ts, p)   
 
 def mpexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(82):
+    if ts.peek() in p.predict(83):
         print("Parsing mpexp -> + binarytd mpexp")
         ts.match('+')
         binarytd(ts, p)
         mpexp(ts, p)
-    elif ts.peek() in p.predict(83):
+    elif ts.peek() in p.predict(84):
         print("Parsing mpexp -> - binarytd mpexp")
         ts.match('-')
         binarytd(ts, p)
         mpexp(ts, p)
-    elif ts.peek() in p.predict(84):
+    elif ts.peek() in p.predict(85):
         print("Parsing mpexp -> ε")
         return    
 
 def binarytd(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(85):
+    if ts.peek() in p.predict(86):
         print("Parsing binarytd -> par <tdexp>") 
         par(ts, p)
         tdexp(ts, p) 
 
 def tdexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(86):
+    if ts.peek() in p.predict(87):
         print("Parsing binarytd -> * par  <tdexp>")
         ts.match('*')
         par(ts, p)
         tdexp(ts, p) 
                 
-    elif ts.peek() in p.predict(87):
+    elif ts.peek() in p.predict(88):
         print("Parsing binarytd -> / par  <tdexp>")
         ts.match('/')
         par(ts, p)
         tdexp(ts, p) 
-    elif ts.peek() in p.predict(88):
+    elif ts.peek() in p.predict(89):
         print("Parsing binarytd -> ε")
         return
     
 def par(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(89):
+    if ts.peek() in p.predict(90):
         print("Parsing par -> ( binarymp )")
         ts.match('(')
         binarymp(ts, p)
         ts.match(')')
-    elif ts.peek() in p.predict(90):
+    elif ts.peek() in p.predict(91):
         print("Parsing par -> value")
         value(ts, p)
 
 def logicexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(91):
+    if ts.peek() in p.predict(92):
         print("Parsing logicexp -> orexp")
         orexp(ts, p)
 
 def orexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(92):
+    if ts.peek() in p.predict(93):
         print("Parsing orexp -> andexp <or>")
         andexp(ts, p)
         #ts.match('or')
         or1(ts, p)
 
 def andexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(93):
+    if ts.peek() in p.predict(94):
         print("Parsing andexp -> factor <and>")
         factor(ts, p)
         #ts.match('and')
@@ -312,14 +305,11 @@ def andexp(ts: token_sequence, p: predict_algorithm) -> None:
         and1(ts, p)
 
 def factor(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(94):
+    if ts.peek() in p.predict(95):
         print("Parsing factor -> not factor")
         ts.match('not')
         factor(ts, p)
-    elif ts.peek() in p.predict(95):
-        print("Parsing factor -> value")
-        value(ts, p)
-    elif ts.peek() in p.predict(64):
+    elif ts.peek() in p.predict(96):
         print("Parsing factor -> ( orexp )")
         ts.match('(')
         orexp(ts, p)
@@ -337,13 +327,13 @@ def assign(ts: token_sequence, p: predict_algorithm) -> None:
         ts.match('+=')
     elif ts.peek() in p.predict(100):
         print("Parsing assign -> -=")
-        ts.match('+=')
+        ts.match('-=')
     elif ts.peek() in p.predict(101):
         print("Parsing assign -> *=")
-        ts.match('+=')
+        ts.match('*=')
     elif ts.peek() in p.predict(102):
         print("Parsing assign -> /=")
-        ts.match('+=')
+        ts.match('/=')
 
 def type(ts: token_sequence, p: predict_algorithm) -> None:
     if ts.peek() in p.predict(103):
@@ -392,22 +382,24 @@ def cmp(ts: token_sequence, p: predict_algorithm) -> None:
         ts.match('less-equal')
 
 def cmpexp(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(115):
-        print("Parsing cmpexp -> term cmp term")
-        term(ts, p)
-        cmp(ts, p)
+    if ts.peek() in p.predict(117):
+        print("Parsing cmpexp -> value term term")
+        value(ts, p)
         term(ts, p)
 
 def term(ts: token_sequence, p: predict_algorithm) -> None:
-    if ts.peek() in p.predict(116):
+    if ts.peek() in p.predict(115):
         print("Parsing term -> value")
         ts.match('value')
+    elif ts.peek() in p.predict(116):
+        print("Parsing term -> ε")
+        return
 
 if __name__ == '__main__':
     G = create_example_grammar()
     print_grammar(G)
     predict_alg = predict_algorithm(G)
-    ts = token_sequence(['S'])
+    ts = token_sequence(['begin', 'main', 'id', 'stmt', 'end', '$'])
     S(ts, predict_alg)
     ll1_result = is_ll1(G, predict_alg)
     print(f"A gramática é LL(1)? {ll1_result}")
