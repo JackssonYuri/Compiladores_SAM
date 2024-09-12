@@ -189,8 +189,11 @@ def assignment(ts: token_sequence, p: predict_algorithm) -> None:
     if ts.peek() in p.predict(74):
         print("Parsing assignment -> id assign arithexp")
         ts.match('id')
+        print("Matched 'id', now parsing assign")
         assign(ts, p)
-        arithexp(ts, p)   
+        print("Finished parsing assign, now parsing arithexp")
+        arithexp(ts, p)
+        print("Finished parsing arithexp")  
 
 def conditional(ts: token_sequence, p: predict_algorithm) -> None:
     if ts.peek() in p.predict(75):
@@ -334,6 +337,8 @@ def assign(ts: token_sequence, p: predict_algorithm) -> None:
     elif ts.peek() in p.predict(102):
         print("Parsing assign -> /=")
         ts.match('/=')
+    else:
+        print(f"Error: Unexpected token {ts.peek()} in assign")
 
 def type(ts: token_sequence, p: predict_algorithm) -> None:
     if ts.peek() in p.predict(103):
@@ -399,7 +404,7 @@ if __name__ == '__main__':
     G = create_example_grammar()
     print_grammar(G)
     predict_alg = predict_algorithm(G)
-    ts = token_sequence(['begin', 'main', 'id', 'stmt', 'end', '$'])
+    ts = token_sequence(['begin', 'main', 'id', '+', 'id', 'end', '$'])
     S(ts, predict_alg)
     ll1_result = is_ll1(G, predict_alg)
     print(f"A gramática é LL(1)? {ll1_result}")
